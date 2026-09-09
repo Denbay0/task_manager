@@ -1,0 +1,1 @@
+{% extends 'tasks/base.html' %}{% block content %}<section class="form-card danger"><p class="tag">CONFIRMATION</p><h1>Удалить задачу?</h1><p>«{{ task.title }}» будет удалена безвозвратно.</p><form method="post">{% csrf_token %}<button class="button">Удалить задачу</button> <a href="{% url 'tasks:list' %}">Отмена</a></form></section>{% endblock %}

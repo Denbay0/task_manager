@@ -1,0 +1,1 @@
+{% extends 'tasks/base.html' %}{% block content %}<section class="form-card"><p class="tag">ACCESS</p><h1>Вход</h1><form method="post">{% csrf_token %}{{ form.as_p }}<button class="button">Войти</button></form></section>{% endblock %}
