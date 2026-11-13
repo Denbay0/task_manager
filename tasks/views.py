@@ -9,7 +9,7 @@ def index(request):
 
 @login_required
 def task_list(request):
-    return render(request, "tasks/list.html", {"tasks": Task.objects.filter(owner=request.user)})
+    return render(request, "tasks/list.html", {"tasks": Task.ordered(request.user)})
 
 @login_required
 def create(request):

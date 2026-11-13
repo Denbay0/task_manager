@@ -1,34 +1,34 @@
 # Task Manager
 
-Персональный менеджер задач на Django. У каждой задачи есть срок и приоритет; выполненные и просроченные задачи визуально различаются.
+Python 3.12, Django 5.2 LTS, django-bootstrap4 и WhiteNoise. Исходник: https://github.com/Denbay0/task_manager. Task содержит owner, title, description, date_added, due_date, priority (low/normal/high) и completed. Миграция 0002 переименовывает поля и переводит числовые приоритеты без удаления задач.
 
-## Возможности
-
-- регистрация, вход и POST-выход;
-- изолированные пользовательские списки;
-- создание, редактирование и удаление с подтверждением;
-- изменение статуса только POST-запросом;
-- deadline, priority, completed и overdue-состояния;
-- защита всех чужих объектов, admin и тесты.
-
-## Локальный запуск
+## Локально
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
+python3.12 -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 python manage.py migrate
+python manage.py createsuperuser
 python manage.py runserver
 ```
 
-Проверки: `python manage.py check && python manage.py test`.
+Для каждого проекта создайте собственное окружение. Проверки: `python manage.py check`, `python manage.py test`, `python manage.py makemigrations --check --dry-run`, `python manage.py migrate --plan`.
 
-## Docker
+## Docker и сервер
 
-Скопируйте `.env.example` в `.env`, затем `docker compose up --build`. Порт: `8003`.
+Скопируйте `.env.example` в `.env`. Установите уникальный случайный `DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS` с IP/доменом сервера и свободный `APP_PORT` (локально 8003). `.env` не коммитить.
 
-Hub: https://github.com/Denbay0/practice_hub
+```bash
+docker compose up -d --build
+docker compose logs --tail 100 web
+docker compose exec web python manage.py createsuperuser
+docker compose exec web python manage.py check --deploy
+docker compose restart web
+```
 
-## Screenshots
+При запуске контейнер применяет миграции; Dockerfile собирает статику. SQLite хранится в именованном томе, который сохраняется при пересборке и перезапуске. Перед обновлением экспортируйте том или сделайте резервную копию базы. Для обновления загрузите новые исходники и повторите `docker compose up -d --build`. Не выполняйте `down -v`.
 
-Скриншоты можно добавить в `docs/screenshots/` после запуска.
+Обязательные переменные: `DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS`, `APP_PORT`. `DJANGO_DEBUG=0` и путь базы внутри тома задаются Compose. При запуске без Docker база находится в `db.sqlite3`; путь можно задать через `DJANGO_DB_PATH`.
+
+Через HTTP по учебному IP `check --deploy` ожидаемо сообщает предупреждения HSTS/HTTPS и secure cookie. Для боевого HTTPS настройте TLS и соответствующие флаги Django.
